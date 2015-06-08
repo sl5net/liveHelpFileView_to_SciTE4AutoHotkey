@@ -4,6 +4,8 @@
 ; F1 will be triggerd as soon something is typed and idle time is more then 650 or so.
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+#Persistent
+
 doMoveCursor:=false
 typedGlobal:=""
 
