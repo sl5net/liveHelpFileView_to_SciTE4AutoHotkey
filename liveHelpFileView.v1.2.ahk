@@ -1,10 +1,10 @@
+#Persistent
 
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-; if you press a letter or curser move script will open help file and get cursor back to scite.
-; F1 will be triggerd as soon something is typed and idle time is more then 650 or so.
+; if you press  letter or curser move script will open help file and get cursor back
+; F1 will be triggerd as soon something is typed and idle time is more then 650 or so
+; helpful during screencast or if you often use helpfile
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-#Persistent
 
 doMoveCursor:=false
 typedGlobal:=""
@@ -12,9 +12,11 @@ typedGlobal:=""
 setbatchlines -1
 SetTitleMatchMode,2
 
-
+is_set_AutoHotkeyHelp_AlwaysOnTop := false
 Loop,
 {
+  is_set_AutoHotkeyHelp_AlwaysOnTop := set_AutoHotkeyHelp_AlwaysOnTop(is_set_AutoHotkeyHelp_AlwaysOnTop)
+  
   WinGetActiveTitle,at
   WinGetClass,ac,%at% 
   atc := at . " ahk_class " . ac 
@@ -47,6 +49,7 @@ Loop,
     ; fight focus back
   ;~ rightNum:=3
 
+  
   loop
   {
     WinActivate,%at%  
@@ -62,6 +65,58 @@ Loop,
   } 
 
 break_outer32: 
+
+fightFocusBack(at)
+  Sleep,500
+ }
+}
+; hjkl
+return
+
+letterPressed(l,typedGlobal){
+  ;~ global typedGlobal
+  typedGlobal .= l ; 
+  ;~ If(l = " "){
+    ;~ openHelpFile(typedGlobal)
+    ;~ typedGlobal:=""
+  ;~ }
+  return typedGlobal
+}
+
+
+#IfWinActive, ahk_class SciTEWindow
+  SciTEWin := "ahk_class SciTEWindow"
+
+~LButton::
+      WinGetActiveTitle,at
+  WinGetClass,ac,%at% 
+  atc := at . " ahk_class " . ac 
+
+    Send,{Blind}
+    Sleep,100
+    ;~ SetKeyDelay,delay,pressduration
+    SetKeyDelay,40,40
+    ;~ Suspend,ontestTestTest.
+    Suspend,on
+    IfWinActive,%SciTEWin%
+      Send,{f1}
+    ;~ SendInput,{f1}
+    Suspend,off
+    ;~ SendPlay,{f1}
+    ;~ Send,{f1}
+  
+    ;~ Send,{Left}{Right} ; that shoud trigger F1 - its workaround
+    ;~ Suspend,off
+  
+    SetKeyDelay,-1,-1
+    ;~ Last_A_This:=A_ThisFunc . A_ThisLabel
+    ;~ ToolTip1sec(A_LineNumber . " " . A_ScriptName . " " . Last_A_This)
+    
+
+    fightFocusBack(at)
+return
+
+fightFocusBack(at){
 WinWaitNotActive,%at%,,2
   lll(A_LineNumber, "liveHelpFileView.v1.2.ahk",Last_A_This)
   Loop
@@ -86,20 +141,8 @@ WinWaitNotActive,%at%,,2
     lll(A_LineNumber, "liveHelpFileView.v1.2.ahk",Last_A_This)
     Sleep,700   
   }
-  Sleep,500
- }
-; hjkl
-return
 
-letterPressed(l,typedGlobal){
-  ;~ global typedGlobal
-  typedGlobal .= l ; 
-  ;~ If(l = " "){
-    ;~ openHelpFile(typedGlobal)
-    ;~ typedGlobal:=""
-  ;~ }
-  return typedGlobal
-}
+
 if(true){
   
 #IfWinActive,ahk_class SciTEWindow  ; x=588,y=22,t=0xf19d8
@@ -139,5 +182,20 @@ if(true){
 ~*Down::typedGlobal := letterPressed("Down",typedGlobal) 
 }
 
+ 
+set_AutoHotkeyHelp_AlwaysOnTop(isOnTop){
+  if(isOnTop==true)
+    return isOnTop
+  autoHotkey_Help_ahk = AutoHotkey Help ahk_class HH Parent
+  ;~ autoHotkey_Help_ahk := AutoHotkey Help
+    IfWinNotExist,%autoHotkey_Help_ahk%
+    {
+      ;~ MsgBox, :( %autoHotkey_Help_ahk%
+      return false
+    }
+    WinSet, AlwaysOnTop, On,%autoHotkey_Help_ahk%
+    ;~ isOnTop:=true
+    return true
+    
+}
 
-return  ; probably redundant. its more secure if we do that.
